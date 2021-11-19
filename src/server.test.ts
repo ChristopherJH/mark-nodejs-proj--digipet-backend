@@ -2,6 +2,7 @@ import supertest from "supertest";
 import {
   feedDigipet,
   hatchDigipet,
+  ignoreDigipet,
   trainDigipet,
   walkDigipet,
 } from "./digipet/controller";
@@ -24,39 +25,39 @@ jest.mock("./digipet/controller");
 describe("GET /", () => {
   it("provides a nod to instructions in the response body", async () => {
     const response = await supertest(app).get("/");
-    expect(response.body.message).toMatch("/instructions");
+    expect(response.body.devMessage).toMatch("/instructions");
   });
 });
 
 describe("GET /instructions", () => {
-  it("responds with a message that has important keywords", async () => {
+  it("responds with a description that has important keywords", async () => {
     const response = await supertest(app).get("/instructions");
     const keywords = ["/digipet", "hatch", "feed", "ignore", "train", "walk"];
     for (let keyword of keywords) {
       // check the keyword is mentioned in the response body
-      expect(response.body.message).toMatch(keyword);
+      expect(response.body.devMessage).toMatch(keyword);
     }
   });
 });
 
 describe("GET /digipet", () => {
-  test("if the user has a digipet, it responds with the digipet data and a message about the user's digipet", async () => {
+  test("if the user has a digipet, it responds with the digipet data and a description about the user's digipet", async () => {
     setDigipet(INITIAL_DIGIPET);
     const response = await supertest(app).get("/digipet");
     expect(response.body.digipet).toStrictEqual(INITIAL_DIGIPET);
-    expect(response.body.message).toMatch(/your digipet/i);
+    expect(response.body.description).toMatch(/your digipet/i);
   });
 
-  test("if the user has no digipet, it responds with a message about not having a digipet", async () => {
+  test("if the user has no digipet, it responds with a description about not having a digipet", async () => {
     setDigipet(undefined);
     const response = await supertest(app).get("/digipet");
     expect(response.body.digipet).not.toBeDefined();
-    expect(response.body.message).toMatch(/don't have/i);
+    expect(response.body.description).toMatch(/don't have/i);
   });
 });
 
 describe("GET /digipet/hatch", () => {
-  test("if the user has a digipet, it responds with a message explaining that a digipet can't be hatched whilst the user has another", async () => {
+  test("if the user has a digipet, it responds with a description explaining that a digipet can't be hatched whilst the user has another", async () => {
     // setup
     if (jest.isMockFunction(hatchDigipet) /* type guard */) {
       hatchDigipet.mockReset();
@@ -67,11 +68,11 @@ describe("GET /digipet/hatch", () => {
     const response = await supertest(app).get("/digipet/hatch");
 
     // assert
-    expect(response.body.message).toMatch(/can't hatch/i);
+    expect(response.body.description).toMatch(/can't hatch/i);
     expect(hatchDigipet).toHaveBeenCalledTimes(0);
   });
 
-  test("if the user has no digipet, it responds with a message about successfully hatching a digipet and calls hatchDigipet", async () => {
+  test("if the user has no digipet, it responds with a description about successfully hatching a digipet and calls hatchDigipet", async () => {
     // setup
     if (jest.isMockFunction(hatchDigipet) /* type guard */) {
       hatchDigipet.mockReset();
@@ -82,8 +83,8 @@ describe("GET /digipet/hatch", () => {
     const response = await supertest(app).get("/digipet/hatch");
 
     // assert
-    expect(response.body.message).toMatch(/success/i);
-    expect(response.body.message).toMatch(/hatch/i);
+    expect(response.body.description).toMatch(/success/i);
+    expect(response.body.description).toMatch(/hatch/i);
     expect(hatchDigipet).toHaveBeenCalledTimes(1);
   });
 });
@@ -104,25 +105,25 @@ describe("action routes", () => {
       }
       setDigipet(undefined);
       const response = await supertest(app).get(route);
-      expect(response.body.message).toMatch(/you don't have/i);
-      expect(response.body.message).toMatch(/try/i);
+      expect(response.body.description).toMatch(/you don't have/i);
+      expect(response.body.devMessage).toMatch(/try/i);
       // suggest a helpful endpoint
-      expect(response.body.message).toMatch("/digipet/hatch");
+      expect(response.body.devMessage).toMatch("/digipet/hatch");
 
       // expect relevant controller not to have been called
       expect(controller).toHaveBeenCalledTimes(0);
     }
   });
 
-  describe.skip("GET /digipet/feed", () => {
-    test("if the user has a digipet, it calls the feedDigipet controller and responds with a message about feeding the digipet", async () => {
+  describe("GET /digipet/feed", () => {
+    test("if the user has a digipet, it calls the feedDigipet controller and responds with a description about feeding the digipet", async () => {
       // setup: reset digipet
       setDigipet(INITIAL_DIGIPET);
 
       const response = await supertest(app).get("/digipet/feed");
 
-      // response includes a relevant message
-      expect(response.body.message).toMatch(/feed/i);
+      // response includes a relevant description
+      expect(response.body.description).toMatch(/fed/i);
 
       // response includes digipet data
       expect(response.body.digipet).toHaveProperty("happiness");
@@ -144,8 +145,8 @@ describe("action routes", () => {
     });
   });
 
-  describe.skip("GET /digipet/train", () => {
-    test("if the user has a digipet, it calls the trainDigipet controller and responds with a message about training the digipet", async () => {
+  describe("GET /digipet/train", () => {
+    test("if the user has a digipet, it calls the trainDigipet controller and responds with a description about training the digipet", async () => {
       // setup: reset digipet
       setDigipet(INITIAL_DIGIPET);
 
@@ -153,8 +154,8 @@ describe("action routes", () => {
 
       // mock function has been called once
 
-      // response includes a relevant message
-      expect(response.body.message).toMatch(/train/i);
+      // response includes a relevant description
+      expect(response.body.description).toMatch(/train/i);
 
       // response includes digipet data
       expect(response.body.digipet).toHaveProperty("happiness");
@@ -176,14 +177,14 @@ describe("action routes", () => {
   });
 
   describe("GET /digipet/walk", () => {
-    test("if the user has a digipet, it responds with a message about the walk", async () => {
+    test("if the user has a digipet, it responds with a description about the walk", async () => {
       // setup: reset digipet
       setDigipet(INITIAL_DIGIPET);
 
       const response = await supertest(app).get("/digipet/walk");
 
-      // response includes a relevant message
-      expect(response.body.message).toMatch(/walk/i);
+      // response includes a relevant description
+      expect(response.body.description).toMatch(/walk/i);
 
       // response includes digipet data
       expect(response.body.digipet).toHaveProperty("happiness");
@@ -202,5 +203,34 @@ describe("action routes", () => {
       // assert
       expect(walkDigipet).toHaveBeenCalledTimes(1);
     });
+  });
+});
+
+describe("GET /digipet/ignore", () => {
+  test("if the user has a digipet, it responds with a description about the ignore", async () => {
+    // setup: reset digipet
+    setDigipet(INITIAL_DIGIPET);
+
+    const response = await supertest(app).get("/digipet/ignore");
+
+    // response includes a relevant description
+    expect(response.body.description).toMatch(/ignore/i);
+
+    // response includes digipet data
+    expect(response.body.digipet).toHaveProperty("happiness");
+    expect(response.body.digipet).toHaveProperty("nutrition");
+    expect(response.body.digipet).toHaveProperty("discipline");
+  });
+
+  it("delegates state change to the ignoreDigipet function", async () => {
+    // setup: reset digipet and mock function
+    setDigipet(INITIAL_DIGIPET);
+    if (jest.isMockFunction(ignoreDigipet) /* type guard */) {
+      ignoreDigipet.mockReset();
+    }
+    // act
+    await supertest(app).get("/digipet/ignore");
+    // assert
+    expect(ignoreDigipet).toHaveBeenCalledTimes(1);
   });
 });

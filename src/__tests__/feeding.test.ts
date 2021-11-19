@@ -23,7 +23,7 @@ describe.skip("When a user feeds a digipet repeatedly, its nutrition increases b
 
   test("GET /digipet informs them that they have a digipet with expected stats", async () => {
     const response = await supertest(app).get("/digipet");
-    expect(response.body.message).toMatch(/your digipet/i);
+    expect(response.body.description).toMatch(/your digipet/i);
     expect(response.body.digipet).toHaveProperty("nutrition", 75);
   });
 
@@ -61,7 +61,7 @@ describe.skip("When a user feeds a digipet repeatedly, its discipline decreases 
 
   test("GET /digipet informs them that they have a digipet with expected stats", async () => {
     const response = await supertest(app).get("/digipet");
-    expect(response.body.message).toMatch(/your digipet/i);
+    expect(response.body.description).toMatch(/your digipet/i);
     expect(response.body.digipet).toHaveProperty("discipline", 11);
   });
 
@@ -99,7 +99,7 @@ describe.skip("When a digipet is maxed out on nutrition, it is still possible to
 
   test("GET /digipet informs them that they have a digipet with expected stats", async () => {
     const response = await supertest(app).get("/digipet");
-    expect(response.body.message).toMatch(/your digipet/i);
+    expect(response.body.description).toMatch(/your digipet/i);
     expect(response.body.digipet).toHaveProperty("nutrition", 100);
     expect(response.body.digipet).toHaveProperty("discipline", 50);
   });

@@ -8,14 +8,14 @@ describe("User can hatch a digipet and inspect it when they don't currently have
 
   test("1st GET /digipet informs them that they don't currently have a digipet", async () => {
     const response = await supertest(app).get("/digipet");
-    expect(response.body.message).toMatch(/don't have/i);
+    expect(response.body.description).toMatch(/don't have/i);
     expect(response.body.digipet).not.toBeDefined();
   });
 
   test("1st GET /digipet/hatch informs them that they have hatched a digipet and includes initial digipet data", async () => {
     const response = await supertest(app).get("/digipet/hatch");
-    expect(response.body.message).toMatch(/success/i);
-    expect(response.body.message).toMatch(/hatch/i);
+    expect(response.body.description).toMatch(/success/i);
+    expect(response.body.description).toMatch(/hatch/i);
     expect(response.body.digipet).toHaveProperty(
       "happiness",
       INITIAL_DIGIPET.happiness
@@ -32,14 +32,14 @@ describe("User can hatch a digipet and inspect it when they don't currently have
 
   test("2nd GET /digipet now informs them that they don't currently have a digipet", async () => {
     const response = await supertest(app).get("/digipet");
-    expect(response.body.message).toMatch(/your digipet/i);
+    expect(response.body.description).toMatch(/your digipet/i);
     expect(response.body.digipet).toBeDefined();
   });
 
   test("2nd GET /digipet/hatch now informs them that they can't hatch another digipet whilst they still have one", async () => {
     const response = await supertest(app).get("/digipet/hatch");
-    expect(response.body.message).not.toMatch(/success/i);
-    expect(response.body.message).toMatch(/can't hatch/i);
+    expect(response.body.description).not.toMatch(/success/i);
+    expect(response.body.description).toMatch(/can't hatch/i);
     expect(response.body.digipet).toHaveProperty(
       "happiness",
       INITIAL_DIGIPET.happiness
